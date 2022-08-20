@@ -1,27 +1,49 @@
 <html>
 <head>
-<style>
-#videoElement {
-    max-height: 80%;
-    max-width: 80%;
-    background-color: #666
-}
-</style>
+    <style>
+        #videoElement {
+            max-height: 80%;
+            max-width: 80%;
+            background-color: #666
+        }
+    </style>
 </head>
 <body>
 <video autoplay muted playsinline id="videoElement"></video>
+<br><button id="btnTakePicture">take picture</button>
+<div id="captures"></div>
 <script>
-var video = document.querySelector("#videoElement");
-
-if (navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
+    let width = 640
+    let height = 480
+    /** @var {HTMLVideoElement} video */
+    const video = document.querySelector("#videoElement");
+    video.addEventListener('loadedmetadata', function(event) {
+        console.log(this.videoWidth, this.videoHeight);
+        width = this.videoWidth
+        height = this.videoHeight
     })
-    .catch(function (e) {
-      console.error(e);
-    });
-}
+
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({video: true})
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (e) {
+                console.error(e);
+            });
+    }
+
+    const captureContainer = document.getElementById('captures')
+    const snapshotButton = document.getElementById('btnTakePicture')
+    snapshotButton.addEventListener('click', function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        captureContainer.appendChild(canvas)
+
+    })
 </script>
 </body>
 </html>
